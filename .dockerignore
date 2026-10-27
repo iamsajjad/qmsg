@@ -1,0 +1,12 @@
+.git
+.gitignore
+.venv
+.pytest_cache
+.superpowers
+__pycache__
+*.pyc
+*.pyo
+tests
+docs
+encrypted.bin
+e91_key.txt

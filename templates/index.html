@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Quanta educational E91 and AES-GCM secure messaging demonstration">
+    <title>{{ role }} | Quanta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+    <script defer src="{{ url_for('static', filename='protocol-sequence.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='ui-state.js') }}"></script>
+    <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+  </head>
+  <body data-role="{{ role }}" data-peer="{{ peer_name }}">
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#messages" aria-label="Quanta messages">
+          <span class="brand-mark" aria-hidden="true">Q</span>
+          <span>Quanta</span>
+        </a>
+
+        <div class="peer-identity" aria-label="Current conversation">
+          <span class="avatar" aria-hidden="true">{{ peer_name[0] }}</span>
+          <span>
+            <strong>{{ peer_name }}</strong>
+            <small>Secure peer on the quanta network</small>
+          </span>
+        </div>
+
+        <span id="peer-status" class="peer-status" aria-live="polite">
+          <span class="status-dot" aria-hidden="true"></span>
+          Checking {{ peer_name }}
+        </span>
+      </header>
+
+      <div class="workspace">
+        <aside class="sidebar" aria-label="Workspace navigation">
+          <p class="sidebar-label">Workspace</p>
+          <nav>
+            <a class="nav-link active" href="#messages"><span aria-hidden="true">●</span>Messages</a>
+            <a class="nav-link" href="#learn"><span aria-hidden="true">◇</span>Learn</a>
+            <a class="nav-link" href="#protocol-details"><span aria-hidden="true">≡</span>Protocol details</a>
+          </nav>
+
+          <section class="session-card" aria-label="Network connection">
+            <strong>Two-container session</strong>
+            <span>{{ role }} → {{ peer_name }}</span>
+            <code>{{ peer_url }}</code>
+          </section>
+        </aside>
+
+        <section id="messages" class="chat-panel" aria-labelledby="conversation-title">
+          <header class="chat-header">
+            <div>
+              <p class="eyebrow">Encrypted messaging</p>
+              <h1 id="conversation-title">{{ role }} ↔ {{ peer_name }}</h1>
+              <p>Secure conversation with {{ peer_name }}</p>
+            </div>
+            <span class="security-badge"><span aria-hidden="true">✓</span>E91 + AES-GCM</span>
+          </header>
+
+          <div id="conversation" class="conversation" aria-live="polite" aria-label="Conversation with {{ peer_name }}">
+            <div class="empty-state">
+              <span aria-hidden="true">✦</span>
+              <strong>Your secure conversation starts here</strong>
+              <p>Send a message to watch each E91 and AES step.</p>
+            </div>
+          </div>
+
+          <div class="composer-area">
+            <form id="message-form" class="composer">
+              <label class="sr-only" for="message">Message for {{ peer_name }}</label>
+              <textarea id="message" name="message" rows="1" maxlength="4096" required placeholder="Message {{ peer_name }}"></textarea>
+              <button id="send-message" type="submit" aria-label="Send securely">
+                <span>Send securely</span>
+                <span aria-hidden="true">→</span>
+              </button>
+            </form>
+            <div class="composer-meta">
+              <span id="action-note" aria-live="polite">Ready for a secure message.</span>
+              <span>Maximum 4096 characters</span>
+            </div>
+          </div>
+        </section>
+
+        <aside id="protocol-rail" class="learning-rail" aria-labelledby="learn-title">
+          <div id="learn" class="learning-header">
+            <p class="eyebrow">Live explainer</p>
+            <h2 id="learn-title">How your message travels</h2>
+            <p>The sequence explains the protocol automatically while the simulator processes your message.</p>
+          </div>
+
+          <div class="progress-track" id="protocol-progress" role="progressbar" aria-label="Secure message progress" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0">
+            <span id="protocol-progress-bar"></span>
+          </div>
+          <div class="progress-copy">
+            <span id="protocol-status" aria-live="polite">Ready to send</span>
+            <span id="protocol-count">0 / 8</span>
+          </div>
+
+          <ol class="protocol-steps">
+            <li data-protocol-step data-description="Alice and Bob receive linked qubits from a simulated Bell pair.">
+              <span class="step-marker">1</span>
+              <div><strong>Create entanglement</strong><p></p></div>
+            </li>
+            <li data-protocol-step data-description="Both peers independently choose how to measure their qubits.">
+              <span class="step-marker">2</span>
+              <div><strong>Choose bases</strong><p></p></div>
+            </li>
+            <li data-protocol-step data-description="The simulator records correlated measurement outcomes for both peers.">
+              <span class="step-marker">3</span>
+              <div><strong>Measure qubits</strong><p></p></div>
+            </li>
+            <li data-protocol-step data-description="A CHSH value above the classical bound demonstrates non-classical correlation.">
+              <span class="step-marker">4</span>
+              <div><strong>Verify CHSH</strong><p></p></div>
+            </li>
+            <li data-protocol-step data-description="Matching outcomes become shared bits and SHA-256 derives the AES key.">
+              <span class="step-marker">5</span>
+              <div><strong>Derive AES key</strong><p></p></div>
+            </li>
+            <li data-protocol-step data-description="AES-GCM encrypts the message and creates an authentication tag.">
+              <span class="step-marker">6</span>
+              <div><strong>Encrypt message</strong><p></p></div>
+            </li>
+            <li data-protocol-step data-description="Ciphertext, nonce, and authenticated metadata travel to the peer container.">
+              <span class="step-marker">7</span>
+              <div><strong>Deliver ciphertext</strong><p></p></div>
+            </li>
+            <li data-protocol-step data-description="{{ peer_name }} authenticates the payload and recovers the original message.">
+              <span class="step-marker">8</span>
+              <div><strong>Decrypt for {{ peer_name }}</strong><p></p></div>
+            </li>
+          </ol>
+
+          <section id="protocol-details" class="metrics" aria-label="Latest protocol result">
+            <div><span>CHSH S</span><strong id="metric-chsh">Waiting</strong></div>
+            <div><span>Candidate key</span><strong id="metric-key-bits">Waiting</strong></div>
+            <div><span>Key error rate</span><strong id="metric-error">Waiting</strong></div>
+          </section>
+        </aside>
+      </div>
+
+      <footer>
+        <strong>Educational simulator.</strong> No physical quantum channel is present. Docker uses service-name DNS on the private <code>quanta</code> network.
+      </footer>
+    </main>
+  </body>
+</html>

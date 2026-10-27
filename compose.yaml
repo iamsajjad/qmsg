@@ -1,0 +1,42 @@
+services:
+  alice:
+    build: .
+    environment:
+      ROLE: Alice
+      PEER_NAME: Bob
+      PEER_URL: http://bob:8000
+      PEER_TOKEN: ${PEER_TOKEN:-assignment2-local-demo}
+      E91_ROUNDS: "4096"
+    ports:
+      - "8080:8000"
+    networks:
+      - quanta
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  bob:
+    build: .
+    environment:
+      ROLE: Bob
+      PEER_NAME: Alice
+      PEER_URL: http://alice:8000
+      PEER_TOKEN: ${PEER_TOKEN:-assignment2-local-demo}
+      E91_ROUNDS: "4096"
+    ports:
+      - "8081:8000"
+    networks:
+      - quanta
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+networks:
+  quanta:
+    driver: bridge
